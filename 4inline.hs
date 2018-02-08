@@ -21,8 +21,6 @@ paramPorDefecto = Params { matriz = fromLists ["*********","*       *","*       
                            nroTiro = 0, ultimoTiro = (1,1), ultimoTiroPc = (-1,-1)}
 
 
-prueba = fromLists ["*********","*       *","*       *","*       *","*       *","*       *","*X      *","*********"]
-
 getSigPieza :: Params -> Char
 getSigPieza (Params{nroTiro = t})
     | odd t = 'O'
@@ -55,16 +53,16 @@ tiro' w@(Params{ matriz = m, nroTiro = t}) col
             pieza = getSigPieza w
             mat = (setElem (pieza) ((row),(col+1)) m)
 
-
 tiroPC :: Params -> Int
 tiroPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
-         -- | 1 == (victoria  w) = 1
-         | 20 < (verificar'PC  w) = (verificar'PC  w) - 20
-         | 10 < (verificar'PC  w) = (verificar'PC  w) - 10
+         | 1 == (victoria  w) = 1
+         | 20 < verificacion = verificacion - 20
+         | 10 < verificacion = verificacion - 10
          | 1 <= (verificar'  w) = verificar'  w
-         | 1 <= (verificar'PC  w) = (verificar'PC  w)
+         | 1 <= verificacion = verificacion
          | otherwise = 1
-
+           where
+                 verificacion = (verificar'PC  w)
 ------------------------------------------------------
 
 getSubStringInit :: String -> String -> Maybe Int
@@ -114,13 +112,11 @@ vVertical w@(Params{ matriz = m, ultimoTiro = (row , col)})
     where 
        x = getSubStringInit (cuatroPiezas' w) $getColumna m (col-1)
 
-
 vDiagonalD :: Params -> Bool
 vDiagonalD params 
      | d /= Nothing = True
      | otherwise = False
      where d = getSubStringInit (cuatroPiezas' params) (diagonalD params)
-
 
 vDiagonalI :: Params -> Bool
 vDiagonalI params
@@ -128,7 +124,9 @@ vDiagonalI params
      | otherwise = False
      where d =  getSubStringInit (cuatroPiezas' params) (diagonalI params)
 
---------------------------------------------------------------
+
+-------------------------------------------------------------
+
 vertical :: Params ->Int
 vertical w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
       | getElem row col mat == getElem (row+1) col mat = 1 + vertical' mat (row+1) col 
@@ -158,12 +156,13 @@ jugarContraJugador = do
 
 jugarContraJugador' :: Params -> IO Params
 jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = forever $ do
-      print $verificar mat
-      print m 
-      print u
-      print "Selecciona columna donde se colocara la ficha"
-      col <- getLine 
-      jugarContraJugador' $ tiro' mat (read col :: Int)
+      print m
+      case () of _ 
+                   | (verificar mat) -> reiniciarJuego mat False
+                   | otherwise -> do  print "Selecciona columna donde se colocara la ficha"
+                                      col <- getLine 
+                                      jugarContraJugador' $ tiro' mat (read col :: Int)
+      
 
 ------------Juega contra PC--------------------------------------
 juegaUser :: Params -> IO Params
@@ -180,35 +179,50 @@ jugar' :: Params -> IO Params
 jugar' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = forever $ do
       print m
       case () of _
-                  | (verificar mat) -> reiniciarJuego mat
+                  | (verificar mat) -> reiniciarJuego mat True
                   | (even n)  ->  juegaUser mat
-                  | otherwise ->  juegaPC mat
-
-reiniciarJuego :: Params -> IO Params
-reiniciarJuego params = do
+                  | otherwise -> juegaPC mat
+                  
+reiniciarJuego :: Params -> Bool -> IO Params
+reiniciarJuego params vsPc = do
         print $"Gano el jugador " ++ [(getUltPieza params)]
-        jugar' paramPorDefecto
+        case () of _ 
+                     | vsPc ->  jugar' paramPorDefecto
+                     | otherwise -> jugarContraJugador' paramPorDefecto
 
 -----------------------------INSERTO CONTROLES----------------------------------
 
 verificar2 :: String -> Int
 verificar2 row 
     | getSubStringInit "XXXX" row /= Nothing = 10
-    | getSubStringInit " XXX" row /= Nothing = (getNum $getSubStringInit " XXX" row) + 1      
-    | getSubStringInit "XXX " row /= Nothing =  (getNum $getSubStringInit "XXX " row) + 4
-    | getSubStringInit "XX X" row /= Nothing = 10 + (getNum $getSubStringInit "XX X" row) + 3
-    | getSubStringInit "X XX" row /= Nothing = 10 + (getNum $getSubStringInit "X XX" row) + 2
+    | getSubStringInit " XX " row /= Nothing = 10 + (getNum $getSubStringInit " XX " row) 
+    | getSubStringInit " XXX" row /= Nothing = 10 + (getNum $getSubStringInit " XXX" row)       
+    | getSubStringInit "XXX " row /= Nothing = 10 + (getNum $getSubStringInit "XXX " row) + 3
+    | getSubStringInit "XX X" row /= Nothing = 10 + (getNum $getSubStringInit "XX X" row) + 2
+    | getSubStringInit "X XX" row /= Nothing = 10 + (getNum $getSubStringInit "X XX" row) + 1
     | otherwise = -1
 
 verificar' :: Params -> Int 
 verificar' w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
-        | (10 < verificar2 (horizontal  w)) && (getElem (row + 1) col mat /= ' ')  =  verificar2 (horizontal  w) - 10
-        | (0 < verificar2 (horizontal  w))  && (10 > verificar2 (horizontal w) ) = verificar2(horizontal  w)
-        | (0 < (verificar2 (diagonalD w))) && (10 > (verificar2 (diagonalI w))) = verificar2(diagonalD w)
-        | (0 < (verificar2 (diagonalI w))) && (10 > (verificar2 (diagonalD w)))= verificar2(diagonalI w)
-        | (vertical w /= -1) &&  (1 + vertical w == 3) = col
-        | (vertical w /= -1) &&  (1 + vertical w == 4) = 1 + vertical w
-        | otherwise = -1
+    | (20 > verifica2H ) && (getElem (row + 1) col mat /= ' ')  =  verifica2H - 10
+    | (20 > verifica2H) = verifica2H
+    | (20 > verifica2D) = verifica2D
+    | (20 > verifica2I)= verifica2I
+    | (1 + vertic == 3) = col
+    | otherwise = -1
+        where 
+             verifica2H = verificar2 (horizontal  w)
+             verifica2D = verificar2 (diagonalD  w)
+             verifica2I = verificar2 (diagonalI  w)
+             vertic = vertical w
+
+victoria :: Params -> Int
+victoria w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
+    | 10 == (verificar2 (horizontal  w)) = 1 
+    | 10 == (verificar2 (diagonalD w)) = 1
+    | 10 == (verificar2 (diagonalI w)) = 1
+    | 4 == 1 + vertical w = 1
+    | otherwise = 0
 
 
 fichaVertical :: Params -> Int
@@ -220,29 +234,44 @@ fichaVertical w@(Params{ matriz = mat, ultimoTiro = (row , col)}) = sum[ 1 | x <
 verificarPC :: String -> Int
 verificarPC row 
     | getSubStringInit "OOOO" row /= Nothing = 10
-    | getSubStringInit " OOO" row /= Nothing = (getNum $getSubStringInit " OOO" row) + 1      
+    | getSubStringInit " OOO" row /= Nothing = 10 +(getNum $getSubStringInit " OOO" row) + 1      
     | getSubStringInit "OOO " row /= Nothing = 10 + (getNum $getSubStringInit "OOO " row) + 4 
     | getSubStringInit "OO O" row /= Nothing = 10 + (getNum $getSubStringInit "OO O" row) + 3
     | getSubStringInit "O OO" row /= Nothing = 10 + (getNum $getSubStringInit "O OO" row) + 2
     | getSubStringInit "OO " row /= Nothing = (getNum $getSubStringInit "OO " row) + 2
     | getSubStringInit " OO" row /= Nothing = (getNum $getSubStringInit " OO" row) + 1
-    | getSubStringInit "O O" row /= Nothing = (getNum $getSubStringInit "O O" row) + 2
-    | getSubStringInit " O " row /= Nothing = (getNum $getSubStringInit " O " row) + 2
-    | getSubStringInit " O" row /= Nothing = (getNum $getSubStringInit " O" row) + 1
-    | getSubStringInit "O " row /= Nothing = (getNum $getSubStringInit "O " row) + 2
     | otherwise = -1
+
+
+
+    --verificaciones para ver
+    --getSubStringInit "O O" row /= Nothing = (getNum $getSubStringInit "O O" row) + 2
+    --getSubStringInit " O " row /= Nothing = (getNum $getSubStringInit " O " row) + 2
+    --getSubStringInit " O" row /= Nothing = (getNum $getSubStringInit " O" row) + 1
+    --getSubStringInit "O " row /= Nothing = (getNum $getSubStringInit "O " row) + 2
+    
 
 
 verificar'PC :: Params -> Int 
 verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
-    | (10 < verificarPC (horizontal  w)) && (getElem (row + 1) col mat /= ' ')  =  verificarPC (horizontal  w) 
-	| (0 < verificarPC (horizontal  w))  && (10 > verificarPC (horizontal  w) )= verificarPC(horizontal  w)
-	| (0 < (verificarPC (diagonalD w))) && (10 > (verificarPC (diagonalI w))) = verificarPC(diagonalD w)
-	| (0 < (verificarPC (diagonalI w))) && (10 > (verificarPC (diagonalD w)))= verificarPC(diagonalI w)
-	| (vertical w /= 0) &&  (1 + vertical w == 3) = 19 + col
-	| otherwise = -1
+  | (10 < verificaH) && (getElem (row + 1) col mat /= ' ')  =  verificaH
+  | (0 < verificaH )  && (10 > verificaH )= verificaH
+  | (0 < verificaD) && (10 > (verificaD)) = verificaD
+  | (0 < verificaI) && (10 > (verificaI))= verificaI
+  | (vertical w /= 0) &&  (1 + vertical w == 3) = 19 + col
+  | otherwise = -1
+        where 
+             verificaH = verificarPC (horizontal  w)
+             verificaD = verificarPC (diagonalD w)
+             verificaI = verificarPC (diagonalI w)
+
+
+victoriaPC :: Params  -> Int
+victoriaPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
+        | 10 == (verificarPC (horizontal  w)) = 1 
+  | 10 == (verificarPC (diagonalD w)) = 1
+  | 10 == (verificarPC (diagonalI w)) = 1
+  | 4 == 1 + vertical w = 1
+  | otherwise = 0
 
 -----------------------------------------------------------------------
-
-
---comentario
