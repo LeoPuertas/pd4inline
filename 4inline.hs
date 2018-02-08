@@ -243,3 +243,6 @@ verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)})
 	| otherwise = -1
 
 -----------------------------------------------------------------------
+
+
+--comentario
