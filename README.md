@@ -27,4 +27,7 @@
 		4. Enter
 
 ## Ver Diferencia, local vs repositorio
-``` $ git diff``` 
+ - ``` $ git diff``` 
+
+## Obtener ultima version
+ - ``` $ git pull origin master``` 
