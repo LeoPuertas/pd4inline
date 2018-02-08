@@ -14,16 +14,27 @@
 
 ## Subir cambios pendientes
 1. Abrir terminal dentro de la carpeta pd4inline
+
 2. ``` $ git add 4inline.hs     ```
+
 3. ``` $ git commit             ```      
+
 		1. Agregar comentario 
+
 		2. Guardar Comentario **Ctrl + O**
+
 		3. Enter 
+
 		4. Salir **Ctrl X**
+
 4. ``` $ git push origin master ```      
+
 		1. Ingresar usuario de github 
+
 		2. Enter 
+
 		3. Ingresar pass github 
+
 		4. Enter
 
 ## Ver Diferencia, local vs repositorio
