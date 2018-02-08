@@ -25,3 +25,6 @@
 		2. Enter 
 		3. Ingresar pass github 
 		4. Enter
+
+## Ver Diferencia, local vs repositorio
+``` $ git diff``` 
