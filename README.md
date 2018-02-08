@@ -16,7 +16,7 @@
 1. Abrir terminal dentro de la carpeta pd4inline
 2. ``` $ git add 4inline.hs     ```
 3. ``` $ git commit             ```      
-  - Agregar comentario 
+		1. Agregar comentario 
   - Guardar Comentario **Ctrl + O**
   - Enter 
   - Salir **Ctrl X**
