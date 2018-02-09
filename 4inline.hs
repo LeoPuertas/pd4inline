@@ -11,15 +11,17 @@ vacio = ' '
 data Params = 
      Params { matriz  :: Matrix Char, 
               nroTiro :: Int, 
+              perdido :: Int, 
               ultimoTiro :: (Int , Int),
               ultimoTiroPc :: (Int, Int)} deriving (Show)   
 
 
-paramPruebas = Params { matriz = fromLists ["*********","*    X   *","* X X   *","*X X    *","*OX X   *","*O      *","*O      *","*********"],
-                           nroTiro = 0,ultimoTiro = (5,2), ultimoTiroPc = (-1,-1)}
+paramPruebas = Params { matriz = fromLists ["*********","*X   X   *","*OX X   *","*X X    *","*OX X   *","*O      *","*O      *","*********"],
+                           nroTiro = 0,ultimoTiro = (1,2), ultimoTiroPc = (-1,-1), perdido = 0}
 
 paramPorDefecto = Params { matriz = fromLists ["*********","*       *","*       *","*       *","*       *","*       *","*       *","*********"],
-                           nroTiro = 0, ultimoTiro = (1,1), ultimoTiroPc = (-1,-1)}
+                           nroTiro = 0, ultimoTiro = (1,1), ultimoTiroPc = (-1,-1), perdido = 0}
+
 
 
 getSigPieza :: Params -> Char
@@ -50,21 +52,30 @@ getFilaTiro w@(Params {matriz = m}) (row, col)
 
       
 tiro' ::Params -> Int -> Params
-tiro' w@(Params{ matriz = m, nroTiro = t}) col 
-    | (even t)  = w {matriz = mat, nroTiro = t + 1, ultimoTiro = (row, col+1)}
-    | otherwise = w {matriz = mat, nroTiro = t + 1, ultimoTiro = (row, col+1), ultimoTiroPc = (row,col+1)}
+tiro' w@(Params{ matriz = m, nroTiro = t, perdido = p}) col 
+    | (even t) && (columnallena w (col)) = w {matriz = (setElem (pieza) ((row),(col+1)) m), nroTiro = t + 1, ultimoTiro = (row, col+1), perdido = 0}
+    | (odd t) &&  (columnallena w (col)) = w {matriz = (setElem (pieza) ((row),(col+1)) m), nroTiro = t + 1, ultimoTiro = (row, col+1), ultimoTiroPc = (row,col+1), perdido = 0}
+    | otherwise = perdioTiro w
       where row = getFilaTiro w (8, (col+1))
             pieza = getSigPieza w
-            mat = (setElem (pieza) ((row),(col+1)) m)
+
+
+columnallena :: Params -> Int -> Bool
+columnallena w@(Params{ matriz = m, nroTiro = t, perdido = p}) col = elem vacio ((toLists $M.transpose m)!!(col))
+     
+
+perdioTiro :: Params -> Params
+perdioTiro w@(Params{ matriz = mat, ultimoTiro = (row , col), nroTiro = t, perdido = p }) = w {matriz = mat, nroTiro = t + 1, ultimoTiro = (row, col), ultimoTiroPc = (row,col), perdido = 1}
+
 
 tiroPC :: Params -> Int
 tiroPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
          | 1 == (victoria  w) = 1
          | 20 < verificacion = verificacion - 20
-         | 10 < verificacion = verificacion - 10
-         | 1 <= (verificar'  w) = verificar'  w
+         | 10 > verificacion  && 0 < verificacion  = verificacion 
+         | 1 <= (verificar'  w) = verificar'  w 
          | 1 <= verificacion = verificacion
-         | otherwise = 1
+         | otherwise = row
            where
                  verificacion = (verificar'PC  w)
 ------------------------------------------------------
@@ -181,10 +192,19 @@ jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = fore
 
 ------------Juega contra PC--------------------------------------
 juegaUser :: Params -> IO Params
-juegaUser mat = do
-         print "Selecciona columna donde se colocara la ficha"
+juegaUser mat@(Params{perdido = p}) = do
+         mensaje p
          col <- getLine 
          jugar' $ tiro' mat (read col :: Int)
+
+
+mensaje :: Int ->IO()
+mensaje x = do
+             case () of _
+                          |(x == 1)  -> print " Perdiste el turno anterior aprovecha este y elige bien la columna:"
+                          |otherwise -> print "Selecciona columna donde se colocara la ficha"
+
+
 
 juegaPC :: Params -> IO Params
 juegaPC mat@(Params{matriz = m, ultimoTiro = (row , col) , nroTiro = n}) = do
@@ -248,17 +268,14 @@ fichaVertical w@(Params{ matriz = mat, ultimoTiro = (row , col)}) = sum[ 1 | x <
 
 verificarPC :: String -> Int
 verificarPC row 
-    | getSubStringInit "OOOO" row /= Nothing = 10
-    | getSubStringInit " OOO" row /= Nothing = 10 +(getNum $getSubStringInit " OOO" row) + 1      
-    | getSubStringInit "OOO " row /= Nothing = 10 + (getNum $getSubStringInit "OOO " row) + 4 
-    | getSubStringInit "OO O" row /= Nothing = 10 + (getNum $getSubStringInit "OO O" row) + 3
-    | getSubStringInit "O OO" row /= Nothing = 10 + (getNum $getSubStringInit "O OO" row) + 2
+    | getSubStringInit "OOOO" row /= Nothing = 20
+    | getSubStringInit " OOO" row /= Nothing = 20 +(getNum $getSubStringInit " OOO" row) + 1      
+    | getSubStringInit "OOO " row /= Nothing = 20 + (getNum $getSubStringInit "OOO " row) + 4 
+    | getSubStringInit "OO O" row /= Nothing = 20 + (getNum $getSubStringInit "OO O" row) + 3
+    | getSubStringInit "O OO" row /= Nothing = 20 + (getNum $getSubStringInit "O OO" row) + 2
     | getSubStringInit "OO " row /= Nothing = (getNum $getSubStringInit "OO " row) + 2
     | getSubStringInit " OO" row /= Nothing = (getNum $getSubStringInit " OO" row) + 1
-    | getSubStringInit "O O" row /= Nothing = (getNum $getSubStringInit "O O" row) + 2
-    | getSubStringInit " O " row /= Nothing = (getNum $getSubStringInit " O " row) + 2
-    | getSubStringInit " O" row /= Nothing = (getNum $getSubStringInit " O" row) + 1
-    | getSubStringInit "O " row /= Nothing = (getNum $getSubStringInit "O " row) + 2
+    | getSubStringInit " O O" row /= Nothing = (getNum $getSubStringInit " O O" row) + 3
     | otherwise = -1
 
 
@@ -275,11 +292,11 @@ verificarPC row
 
 verificar'PC :: Params -> Int 
 verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
-  | (10 < verificaH) && (getElem (row + 1) col mat /= ' ')  =  verificaH
-  | (0 < verificaH )  && (10 > verificaH )= verificaH
-  | (0 < verificaD) && (10 > (verificaD)) = verificaD
-  | (0 < verificaI) && (10 > (verificaI))= verificaI
-  | (vertical w /= 0) &&  (1 + vertical w == 3) && ( not (vBloquoVertical w)) = 19 + col
+  | (20 < verificaH) && (getElem (row + 1) col mat /= ' ')  =  verificaH
+  | (0 < verificaH )  && (20 > verificaH )= verificaH
+  | (0 < verificaD) && (20 > (verificaD)) = verificaD
+  | (0 < verificaI) && (20 > (verificaI))= verificaI
+  | (vertical w /= 0) &&  (1 + vertical w == 3) && ( not (vBloquoVertical w)) && (columnallena w (col)) = 19 + col
   | otherwise = -1
         where 
              verificaH = verificarPC (horizontal  w)
@@ -289,9 +306,9 @@ verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)})
 
 victoriaPC :: Params  -> Int
 victoriaPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
-        | 10 == (verificarPC (horizontal  w)) = 1 
-        | 10 == (verificarPC (diagonalD w)) = 1
-        | 10 == (verificarPC (diagonalI w)) = 1
+        | 20 == (verificarPC (horizontal  w)) = 1 
+        | 20 == (verificarPC (diagonalD w)) = 1
+        | 20 == (verificarPC (diagonalI w)) = 1
         | 4 == 1 + vertical w = 1
         | otherwise = 0
 
