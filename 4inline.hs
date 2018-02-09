@@ -5,6 +5,7 @@ import Data.Matrix as M
 import Control.Monad
 import Data.List as L
 
+
 vacio = ' '
 
 data Params = 
@@ -14,8 +15,8 @@ data Params =
               ultimoTiroPc :: (Int, Int)} deriving (Show)   
 
 
-paramPruebas = Params { matriz = fromLists ["*********","*X   X   *","* X X   *","*  X    *","*XX X   *","*       *","*       *","*********"],
-                           nroTiro = 0,ultimoTiro = (5,3), ultimoTiroPc = (-1,-1)}
+paramPruebas = Params { matriz = fromLists ["*********","*    X   *","* X X   *","*X X    *","*OX X   *","*O      *","*O      *","*********"],
+                           nroTiro = 0,ultimoTiro = (5,2), ultimoTiroPc = (-1,-1)}
 
 paramPorDefecto = Params { matriz = fromLists ["*********","*       *","*       *","*       *","*       *","*       *","*       *","*********"],
                            nroTiro = 0, ultimoTiro = (1,1), ultimoTiroPc = (-1,-1)}
@@ -30,6 +31,9 @@ getUltPieza :: Params -> Char
 getUltPieza (Params{nroTiro = t})
     | odd t = 'X'
     | otherwise = 'O'
+
+bloqueoVertical :: String
+bloqueoVertical = "XOOO"    
 
 cuatroPiezas :: Char -> [Char]
 cuatroPiezas p = replicate 4 p
@@ -111,6 +115,17 @@ vVertical w@(Params{ matriz = m, ultimoTiro = (row , col)})
     | otherwise = False
     where 
        x = getSubStringInit (cuatroPiezas' w) $getColumna m (col-1)
+
+
+
+
+vBloquoVertical:: Params -> Bool
+vBloquoVertical w@(Params{ matriz = m, ultimoTiro = (row , col)}) 
+    | (x /= Nothing) = True 
+    | otherwise = False
+    where 
+       x = getSubStringInit (bloqueoVertical)  $getColumna m (col-1)
+
 
 vDiagonalD :: Params -> Bool
 vDiagonalD params 
@@ -240,7 +255,13 @@ verificarPC row
     | getSubStringInit "O OO" row /= Nothing = 10 + (getNum $getSubStringInit "O OO" row) + 2
     | getSubStringInit "OO " row /= Nothing = (getNum $getSubStringInit "OO " row) + 2
     | getSubStringInit " OO" row /= Nothing = (getNum $getSubStringInit " OO" row) + 1
+    | getSubStringInit "O O" row /= Nothing = (getNum $getSubStringInit "O O" row) + 2
+    | getSubStringInit " O " row /= Nothing = (getNum $getSubStringInit " O " row) + 2
+    | getSubStringInit " O" row /= Nothing = (getNum $getSubStringInit " O" row) + 1
+    | getSubStringInit "O " row /= Nothing = (getNum $getSubStringInit "O " row) + 2
     | otherwise = -1
+
+
 
 
 
@@ -258,7 +279,7 @@ verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)})
   | (0 < verificaH )  && (10 > verificaH )= verificaH
   | (0 < verificaD) && (10 > (verificaD)) = verificaD
   | (0 < verificaI) && (10 > (verificaI))= verificaI
-  | (vertical w /= 0) &&  (1 + vertical w == 3) = 19 + col
+  | (vertical w /= 0) &&  (1 + vertical w == 3) && ( not (vBloquoVertical w)) = 19 + col
   | otherwise = -1
         where 
              verificaH = verificarPC (horizontal  w)
@@ -269,9 +290,9 @@ verificar'PC w@(Params{ matriz = mat, ultimoTiro = (row , col)})
 victoriaPC :: Params  -> Int
 victoriaPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
         | 10 == (verificarPC (horizontal  w)) = 1 
-  | 10 == (verificarPC (diagonalD w)) = 1
-  | 10 == (verificarPC (diagonalI w)) = 1
-  | 4 == 1 + vertical w = 1
-  | otherwise = 0
+        | 10 == (verificarPC (diagonalD w)) = 1
+        | 10 == (verificarPC (diagonalI w)) = 1
+        | 4 == 1 + vertical w = 1
+        | otherwise = 0
 
 -----------------------------------------------------------------------
