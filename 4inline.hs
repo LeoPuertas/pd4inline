@@ -18,7 +18,7 @@ data Params =
               ultimoTiroPc :: (Int, Int)} deriving (Show)   
 
 
-paramPruebas = Params { matriz = fromLists ["*********","*       *","*       *","*       *","*  X    *","*XXOX   O*","*XOXXOOO*","*1234567*"],
+paramPruebas = Params { matriz = fromLists ["*********","*O      *","*X      *","*X      *","*O X    *","*XXOX   O*","*XOXXOOO*","*1234567*"],
                            nroTiro = 13,ultimoTiro = (5,4), ultimoTiroPc = (6,4), perdido = 0}
 
 paramPorDefecto = Params { matriz = fromLists ["*********","*       *","*       *","*       *","*       *","*       *","*       *","*1234567*"],
@@ -72,7 +72,7 @@ columnallena w@(Params{matriz = m}) col = elem vacio ((toLists $M.transpose m)!!
      
 
 perdioTiro :: Params -> Params
-perdioTiro w@(Params{nroTiro = t}) = w {nroTiro = t - 1, perdido = 1}
+perdioTiro w@(Params{nroTiro = t}) = w { perdido = 1}
 
 
 tiroPC :: Params -> Int
