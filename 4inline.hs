@@ -4,6 +4,8 @@
 import Data.Matrix as M
 import Control.Monad
 import Data.List as L
+import Text.Read
+import System.Console.ANSI -- cabal install ansi-terminal     
 
 
 vacio = ' '
@@ -208,24 +210,42 @@ jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = fore
       print m
       case () of _ 
                    | (verificar mat) -> reiniciarJuego mat False
-                   | otherwise -> do  print "Selecciona columna donde se colocara la ficha"
+                   | otherwise -> do  putStrLn "Selecciona columna donde se colocara la ficha"
                                       col <- getLine 
-                                      jugarContraJugador' $ tiro' mat (read col :: Int)
+                                      case (checkInput col) of True -> jugarContraJugador' $ tiro' mat (read col :: Int) 
+                                                               otherwise -> do putStrLn "Error de Jugada, intente de nuevo"
+                                                                               jugarContraJugador' mat
+                                      
       
+
+checkInput :: String -> Bool
+checkInput i 
+            | num /= Nothing = case () of _
+                                           | getNum num > 7 -> False
+                                           | getNum num < 1 -> False
+                                           | otherwise -> True 
+            | otherwise = False
+          where num = readMaybeInt i
+
+readMaybeInt :: String -> Maybe Int
+readMaybeInt = readMaybe
+
 
 ------------Juega contra PC--------------------------------------
 juegaUser :: Params -> IO Params
 juegaUser mat@(Params{perdido = p, ultimoTiro =u,nroTiro = n}) = do
          mensaje p
          col <- getLine 
-         jugar' $ tiro' mat (read col :: Int)
+         case (checkInput col) of True -> jugar' $ tiro' mat (read col :: Int) 
+                                  otherwise ->  do putStrLn "Error de Jugada, intente de nuevo"
+                                                   jugar' mat
 
 
 mensaje :: Int ->IO()
 mensaje x = do
              case () of _
-                          |(x == 1)  -> print " Perdiste el turno anterior aprovecha este y elige bien la columna:"
-                          |otherwise -> print "Selecciona columna donde se colocara la ficha"
+                          |(x == 1)  -> putStrLn " Perdiste el turno anterior aprovecha este y elige bien la columna:"
+                          |otherwise -> putStrLn "Selecciona columna donde se colocara la ficha"
 
 
 
@@ -243,7 +263,7 @@ jugar' mat@(Params{matriz = m, nroTiro = n}) = forever $ do
                   
 reiniciarJuego :: Params -> Bool -> IO Params
 reiniciarJuego params vsPc = do
-        print $"Gano el jugador " ++ [(getUltPieza params)]
+        putStrLn $"Gano el jugador " ++ [(getUltPieza params)]
         case () of _ 
                      | vsPc ->  jugar' paramPorDefecto
                      | otherwise -> jugarContraJugador' paramPorDefecto
@@ -379,3 +399,6 @@ victoriaPC w@(Params{ matriz = mat, ultimoTiro = (row , col)})
         | otherwise = 0
 
 -----------------------------------------------------------------------
+
+limpiarPantalla :: IO()
+limpiarPantalla = clearScreen
