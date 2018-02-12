@@ -210,11 +210,24 @@ jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = fore
       print m
       case () of _ 
                    | (verificar mat) -> reiniciarJuego mat False
+                   | lleno mat -> empate mat False
                    | otherwise -> do  putStrLn "Selecciona columna donde se colocara la ficha"
                                       col <- getLine 
                                       case (checkInput col) of True -> jugarContraJugador' $ tiro' mat (read col :: Int) 
                                                                otherwise -> do putStrLn "Error de Jugada, intente de nuevo"
                                                                                jugarContraJugador' mat
+
+
+
+lleno :: Params -> Bool
+lleno w@(Params{matriz = m}) = notElem vacio ((toList $M.transpose m)) 
+
+empate :: Params -> Bool -> IO Params
+empate params vsPc = do
+        putStrLn $"El juego finalizo en empate " 
+        case () of _ 
+                     | vsPc ->  jugar' paramPorDefecto
+                     | otherwise -> jugarContraJugador' paramPorDefecto 
                                       
       
 
