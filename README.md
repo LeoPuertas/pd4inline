@@ -56,10 +56,10 @@ Cuando se logre el objetivo aparecera un mensaje mostrando quien fue el jugador 
 
 ## Imágenes
 
-![](http://goo.gl/iaCh8E)
+![1](https://image.ibb.co/fLWNbS/1.png)
 
-![](https://goo.gl/VVQPzC)
+![2](https://image.ibb.co/mXfti7/1.png)
 
-![](https://goo.gl/ssGmhq)
+![3](https://image.ibb.co/fz0hbS/2.png)
 
-![](https://goo.gl/XGWNA3)
+![4](https://image.ibb.co/jcaFwS/3.png)
