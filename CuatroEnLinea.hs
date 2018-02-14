@@ -8,6 +8,7 @@ import CuatroEnLinea.Piezas
 import CuatroEnLinea.Funciones
 import CuatroEnLinea.Verificaciones
 import CuatroEnLinea.Jugadas
+import CuatroEnLinea.Grafico
 
 import System.Exit
 -------------Modos Juego--------------------------------------
@@ -83,6 +84,7 @@ reiniciarJuego :: Params  -> IO Params
 reiniciarJuego params = do
         limpiarPantalla  
         print (matriz params)
+        mostrarTablero params
         putStrLn $"Gano el jugador " ++ [(getUltPieza params)] ++ "\n"
         main
 
