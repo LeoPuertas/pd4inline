@@ -24,8 +24,10 @@ empate
 
 ## Requisitos Ejecutar Cuatro en linea
 1. Descargar [Data.Matrix](http://goo.gl/CukqnJ)
-2. Instalar *Data.Matrix* 
-```$ cabal install matrix-0.3.5.0.tar.gz ``` 
+2. Instalar **Data.Matrix**  
+    ```$ cabal install matrix-0.3.5.0.tar.gz ``` 
+3. Instalar **System.Console.ANSI**
+    ```$ cabal install ansi-terminal ```     
 
 ## Clonar Repositorio
 1. ```$ git clone https://github.com/LeoPuertas/pd4inline ``` 
