@@ -37,20 +37,20 @@ jugarContraPc = do
 jugarContraJugador :: IO Params
 jugarContraJugador = do
       limpiarPantalla
-      putStrLn "Inicio de juego vs Pc"
+      putStrLn "Inicio de juego vs Jugador"
       jugarContraJugador' paramPorDefecto
 
 ------------Juega contra Jugador---------------------------------
 
 jugarContraJugador' :: Params -> IO Params
 jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = do
-      limpiarPantalla
       case () of _ 
                    | (vVictoria mat) -> reiniciarJuego mat
                    | lleno mat -> empate mat
                    | otherwise -> do  print m
                                       putStrLn "Selecciona columna donde se colocara la ficha"
                                       col <- getLine 
+                                      limpiarPantalla
                                       case (checkInput col) of True -> jugarContraJugador' $ tiro' mat (read col :: Int) 
                                                                otherwise -> do putStrLn "Error de Jugada, intente de nuevo"
                                                                                jugarContraJugador' mat
