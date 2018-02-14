@@ -1,19 +1,17 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 
+module CuatroEnLinea.Grafico where
+
+import CuatroEnLinea.Tipos 
+import CuatroEnLinea.Piezas
 
 import Data.Matrix as M
 import Control.Monad
 import Data.List as L
-import Text.Read
 import System.Console.ANSI -- cabal install ansi-terminal     
 import Graphics.Gloss as G
 import Data.Monoid
-
-
-
-
-matriz :: Matrix Char
-matriz = fromLists ["*********","*O      *","*X      *","*X      *","*O X    *","*XXOX   O*","*XOXXOOO*","*1234567*"]
+import Data.Monoid ((<>))
 
 
 
@@ -29,26 +27,29 @@ data Picture = Line    G.Path
              | Text    String
 
 
+mostrarTablero :: Params -> IO()
+mostrarTablero mat@(Params{matriz = m})= display (InWindow "Cuatro en Linea" (800,750) (100,300)) (dark yellow) (tableroIO mat)
 
 
 
-
-main = tableroConFichas
-
-
-
-
-
-
-tableroVacio :: IO()
-tableroVacio = display (InWindow "4 IN LINE" (800, 750) (100, 300)) (dark yellow) (tablero)
+tableroIO :: Params-> G.Picture
+tableroIO mat@(Params{matriz = m}) = 
+    G.Pictures [board,fichasX,fichasO,fichasV]
+    where board = tablero mat
+          fichasX = getFichasX m
+          fichasO = getFichasO m
+          fichasV = getFichasVacias m
 
 
---tableroConFichas :: IO()
---tableroConFichas = display (InWindow "4 IN LINE" (800, 750) (100, 300)) (dark yellow) (fichas)
 
-tableroConFichas :: IO()
-tableroConFichas = display(InWindow "4 IN LINE" (800, 750) (100, 300)) (dark yellow) (fichas)
+getFichasX :: Matrix Char-> G.Picture
+getFichasX  m = G.Pictures  [ fichaX (toFloat y) (toFloat x) | y <-[1,2..7], x <- [2,3..8], (getElem y x m) == 'X']
+
+getFichasO :: Matrix Char -> G.Picture
+getFichasO  m = G.Pictures  [ fichaO (toFloat y) (toFloat x) | y <-[1,2..7], x <- [2,3..8], (getElem y x m) == 'O']
+
+getFichasVacias :: Matrix Char -> G.Picture
+getFichasVacias  m =  fichasVacias (show(length [ x | y <-[1,2..7], x <- [2,3..8], (getElem y x m) == ' ']))
 
 
 
@@ -56,32 +57,9 @@ toFloat:: Int-> Float
 toFloat x = (fromIntegral(x))::Float
 
 
-fichasXenMatriz :: G.Picture
-fichasXenMatriz= G.Pictures  [ fichaX (toFloat y) (toFloat x) | y <-[1,2..7], x <- [2,3..8], (getElem y x matriz) == 'X']
 
-fichasOenMatriz :: G.Picture
-fichasOenMatriz= G.Pictures  [ fichaO (toFloat y) (toFloat x) | y <-[1,2..7], x <- [2,3..8], (getElem y x matriz) == 'O']
-
-fichasVaciasenMatriz :: G.Picture
-fichasVaciasenMatriz=  fichasVacias (show(length [ x | y <-[1,2..7], x <- [2,3..8], (getElem y x matriz) == ' ']))
-
-
-
---mat :: G.Picture
---mat = G.Pictures [fila1,fila2,fila3]
-
-
---fila1 :: Int-> G.Picture
---fila1 = G.Pictures [cuadrado1 ,cuadrado2,cuadrado3,cuadrado4 ,cuadrado5,cuadrado6,cuadrado7 ,cuadrado8,cuadrado9]
-
-
-
-tablero :: G.Picture
-tablero = G.Pictures [titulo,linea2,linea3,linea4,linea5,linea6,linea7,linea8,linea10,linea11,linea12,linea13,linea14,linea15,linea16,linea17,linea19,linea20]
-
-
-fichas :: G.Picture
-fichas = G.Pictures [tablero,fichasXenMatriz,fichasOenMatriz,fichasVaciasenMatriz]
+tablero :: Params -> G.Picture
+tablero para = G.Pictures [titulo para,linea2,linea3,linea4,linea5,linea6,linea7,linea8,linea10,linea11,linea12,linea13,linea14,linea15,linea16,linea17,linea19,linea20]
 
 
 
@@ -105,7 +83,6 @@ linea7 = G.Line[(-319,-122),(220,-122)]
 
 linea8:: G.Picture
 linea8 = G.Line[(-319,-182),(220,-182)]
-
 
 linea10:: G.Picture
 linea10 = G.Line[(-319,178),(-319,-182)]
@@ -146,13 +123,10 @@ linea20  = Translate (-398) (-225) $
          G.Text "* 234567*" 
 
 
-
-titulo:: G.Picture
-titulo  = Translate (-378) (248) $ 
-         Scale 0.2 0.2 $ 
-         G.Text "CLICK SOBRE EL NUMERO DE LA COLUMNA" 
-
-
+titulo:: Params -> G.Picture
+titulo para = Translate (-280) (248) $ 
+         Scale 0.4 0.3 $ 
+         G.Text ("GANO EL JUGADOR " ++ [getUltPieza para])
 
 
 fichaX :: Float -> Float  -> G.Picture
