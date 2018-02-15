@@ -20,7 +20,7 @@ vVictoria params = (vVertical || vHorizontal || vDiagonalI || vDiagonalD)
 
 --VERIFICA SI HORIZONTALMENTE HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaH :: Params -> Bool 
-vVictoriaH w@(Params{ matriz = m, ultimoTiro = (row , col)}) 
+vVictoriaH w@(Params{ matriz = m, ultimoTiro = (row , _)}) 
     | (x /= Nothing) = True 
     | otherwise = False
     where
@@ -28,7 +28,7 @@ vVictoriaH w@(Params{ matriz = m, ultimoTiro = (row , col)})
 
 --VERIFICA SI VERTICALMENTE HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaV :: Params -> Bool
-vVictoriaV w@(Params{ matriz = m, ultimoTiro = (row , col)}) 
+vVictoriaV w@(Params{ matriz = m, ultimoTiro = (_ , col)}) 
     | (x /= Nothing) = True 
     | otherwise = False
     where 
@@ -52,7 +52,7 @@ vVictoriaDiagI params
 --FUNCION QUE INDICA SI HUBO UNA JUGADA DONDE HABIA 3 FICHAS CONSECUTIVAS PERO SE BLOQUEO ESA JUGADA, SE UTILIZA PARA NO SEGUIR TIRANDO EN ESA COLUMNA 
 --INTENTANDO FORMAR UNA VICTORIA VERTICAL YA QUE NO ES POSIBLE
 vBloquoVertical:: Params -> Bool
-vBloquoVertical (Params{ matriz = m, ultimoTiro = (row , col)}) 
+vBloquoVertical (Params{ matriz = m, ultimoTiro = (_ , col)}) 
     | (x /= Nothing) = True 
     | otherwise = False
     where 

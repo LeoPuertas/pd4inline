@@ -3,7 +3,6 @@
 module CuatroEnLinea.Matriz where
 
 import CuatroEnLinea.Tipos
-import CuatroEnLinea.Constantes
 import CuatroEnLinea.Piezas
 
 import Data.Matrix
@@ -29,7 +28,7 @@ verticalTiroJugador w@(Params{ matriz = mat, ultimoTiro = (row , col)})
       | pieza == getElem (row + 1) col mat = 1 + vertical' mat (row) (col) pieza
       | otherwise = 0
       where 
-      	pieza = getUltPieza w 
+        pieza = getUltPieza w 
 
 --FUNCION QUE DEVUELVE LA COLUMNA SEGUN EL ULTIMO TIRO DEL PC
 verticalTiroPC :: Params -> Int
@@ -46,10 +45,11 @@ vertical' mat row  col pieza
 
 --FUNCION QUE DEVUELVE LA FILA SEGUN EL ULTIMO TIRO DEL JUGADOR
 horizontal :: Params -> [Char] 
-horizontal (Params{ matriz = m,ultimoTiro = (row , col)}) = getFila m (row-1)
+horizontal (Params{ matriz = m,ultimoTiro = (row , _)}) = getFila m (row-1)
 
 --FUNCION QUE DEVUELVE LA FILA SEGUN EL ULTIMO TIRO DEL PC
-horizontal2 (Params{ matriz = m,ultimoTiroPc = (rowPC,colPC)}) = getFila m (rowPC-1)
+horizontal2 :: Params -> [Char]
+horizontal2 (Params{ matriz = m,ultimoTiroPc = (rowPC,_)}) = getFila m (rowPC-1)
 
 horizontal' ::Params -> Int -> [Char]
 horizontal' (Params{ matriz = m}) row = getFila m (row-1)

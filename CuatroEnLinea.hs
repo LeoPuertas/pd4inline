@@ -23,7 +23,7 @@ main = do
         case opc of  
               "1" -> jugarContraPc
               "2" -> jugarContraJugador
-              otherwise  -> exitSuccess
+              _  -> exitSuccess
 
 
 
@@ -43,7 +43,7 @@ jugarContraJugador = do
 ------------Juega contra Jugador---------------------------------
 
 jugarContraJugador' :: Params -> IO Params
-jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n, perdido = p})  
+jugarContraJugador' mat@(Params{matriz = m, perdido = p})  
       | (vVictoria mat) = reiniciarJuego mat
       | lleno mat = empate mat
       | otherwise =  do print m
@@ -60,8 +60,8 @@ jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n, perdido
 ------------Juega contra PC--------------------------------------
 
 juegaUser :: Params -> IO Params
-juegaUser mat@(Params{matriz = m, perdido = p, ultimoTiro =u,nroTiro = n}) = do
-         mensaje p
+juegaUser mat = do
+         mensaje (perdido mat)
          col <- getLine 
          if (checkInput col) 
            then jugar' $ tiro' mat (read col :: Int) 

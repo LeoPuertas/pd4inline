@@ -37,7 +37,7 @@ tiro' w@(Params{ matriz = m, nroTiro = t}) col
 --REALIZA EL TIRO POR PROXIMIDAD A OTRA FICHA
 --
 tiroPC :: Params -> Int 
-tiroPC w@(Params{ matriz = mat, ultimoTiro = (row , col)}) 
+tiroPC w@(Params{ultimoTiro = (row , _)}) 
          | vicPC /= -1 = vicPC
          | vicUser /= -1 = vicUser
          | jugadaPc /= -1 = jugadaPc
@@ -96,11 +96,11 @@ vPosibJugadaPc w@(Params{ matriz = mat, ultimoTiro = (row , col)})
 ------------------------------------------------------------------------------------
 --SI TIRO EN UNA COLUMNA LLENA SE MARCA EL TIRO PERDIDO PARA DAR EL MENSAJE
 perdioTiro :: Params -> Params
-perdioTiro w@(Params{perdido = p}) = w { perdido = 1}
+perdioTiro w = w { perdido = 1}
 
 --FUNCION UTILIZADA EN CASO DE QUE NINGUNO DE LOS DOS ULTIMOS TIROS SIRVA DE REFERENCIAA PARA UNA JUGADA, ESTA FUNCION DEVUELVE SI HAY ALGUNA PENDIENTE SIN REFERENCIA
 barreFilasyColumnas:: Params -> Bool -> [Int] 
-barreFilasyColumnas w@(Params{ matriz = mat}) ganar = [ vFyC | row <- [7,6..1], col <- [1..8], 
+barreFilasyColumnas (Params{ matriz = mat}) ganar = [ vFyC | row <- [7,6..1], col <- [1..8], 
               let vFyC = (if ganar 
                              then (vFilayColumnaGanar mat row col) 
                              else (vFilayColumnaJugada mat row col)), vFyC > 0 ]

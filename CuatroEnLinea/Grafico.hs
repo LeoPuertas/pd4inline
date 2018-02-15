@@ -6,13 +6,7 @@ import CuatroEnLinea.Tipos
 import CuatroEnLinea.Piezas
 
 import Data.Matrix as M
-import Control.Monad
-import Data.List as L
-import System.Console.ANSI -- cabal install ansi-terminal     
 import Graphics.Gloss as G
-import Data.Monoid
-import Data.Monoid ((<>))
-
 
 
 type Point = (Float, Float)
@@ -28,7 +22,7 @@ data Picture = Line    G.Path
 
 
 mostrarTablero :: Params -> IO()
-mostrarTablero mat@(Params{matriz = m})= display (InWindow "Cuatro en Linea" (800,750) (100,300)) (dark yellow) (tableroIO mat)
+mostrarTablero mat = display (InWindow "Cuatro en Linea" (800,750) (100,300)) (dark yellow) (tableroIO mat)
 
 
 
