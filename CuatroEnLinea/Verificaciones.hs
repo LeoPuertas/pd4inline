@@ -39,8 +39,7 @@ vVictoriaDiagD :: Params -> Bool
 vVictoriaDiagD params 
      | d /= Nothing = True
      | otherwise = False
-     where 
-      d = getSubStringInit (cuatroPiezas params) (diagonalD params)
+     where d = getSubStringInit (cuatroPiezas params) (diagonalD params)
 
 --VERIFICA SI DIAGONALMENTE CRECIENTE A LA IZQUIERDA HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaDiagI :: Params -> Bool

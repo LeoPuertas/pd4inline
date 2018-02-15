@@ -54,6 +54,3 @@ horizontal2 (Params{ matriz = m,ultimoTiroPc = (rowPC,colPC)}) = getFila m (rowP
 horizontal' ::Params -> Int -> [Char]
 horizontal' (Params{ matriz = m}) row = getFila m (row-1)
 
-horizontal' ::Params -> Int -> [Char]
-horizontal' w@(Params{ matriz = m}) row = getFila m (row-1)
-
