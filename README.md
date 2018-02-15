@@ -60,6 +60,11 @@ El objetivo es completar 4 piezas alineadas en horizontal, vertical o diagonal.
 
 Cuando se logre el objetivo aparecera un mensaje mostrando quien fue el jugador ganador.
 
+## Instalar a través de cabal   
+
+    $ cabal configure
+    $ cabal build
+    $ cabal install
 
 ## Imágenes
 

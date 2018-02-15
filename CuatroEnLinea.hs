@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 
-module CuatroEnLinea where
+module Main where
 
 import CuatroEnLinea.Tipos
 import CuatroEnLinea.Constantes
