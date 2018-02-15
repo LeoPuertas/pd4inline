@@ -20,10 +20,10 @@ main = do
         putStrLn "2. 2 Jugadores"
         putStrLn "3. Salir"
         opc <- getLine
-        case opc of _ 
-                     | opc == "1" -> jugarContraPc
-                     | opc == "2" -> jugarContraJugador
-                     | otherwise  -> exitSuccess
+        case opc of  
+              "1" -> jugarContraPc
+              "2" -> jugarContraJugador
+              otherwise  -> exitSuccess
 
 
 
@@ -43,17 +43,19 @@ jugarContraJugador = do
 ------------Juega contra Jugador---------------------------------
 
 jugarContraJugador' :: Params -> IO Params
-jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n}) = do
-      case () of _ 
-                   | (vVictoria mat) -> reiniciarJuego mat
-                   | lleno mat -> empate mat
-                   | otherwise -> do  print m
-                                      putStrLn "Selecciona columna donde se colocara la ficha"
-                                      col <- getLine 
-                                      limpiarPantalla
-                                      case (checkInput col) of True -> jugarContraJugador' $ tiro' mat (read col :: Int) 
-                                                               otherwise -> do putStrLn "Error de Jugada, intente de nuevo"
-                                                                               jugarContraJugador' mat
+jugarContraJugador' mat@(Params{matriz = m, ultimoTiro = u, nroTiro = n, perdido = p})  
+      | (vVictoria mat) = reiniciarJuego mat
+      | lleno mat = empate mat
+      | otherwise =  do print m
+                        mensaje p
+                        col <- getLine 
+                        limpiarPantalla
+                        if  (checkInput col) 
+                          then  jugarContraJugador' $ tiro' mat (read col :: Int) 
+                          else do 
+                                  print mat
+                                  putStrLn "Error de Jugada, intente de nuevo"
+                                  jugarContraJugador' mat
 
 ------------Juega contra PC--------------------------------------
 
@@ -61,9 +63,10 @@ juegaUser :: Params -> IO Params
 juegaUser mat@(Params{matriz = m, perdido = p, ultimoTiro =u,nroTiro = n}) = do
          mensaje p
          col <- getLine 
-         case (checkInput col) of True -> jugar' $ tiro' mat (read col :: Int) 
-                                  otherwise ->  do putStrLn "Error de Jugada, intente de nuevo"
-                                                   jugar' mat
+         if (checkInput col) 
+           then jugar' $ tiro' mat (read col :: Int) 
+           else do putStrLn "Error de Jugada, intente de nuevo"
+                   jugar' mat
 
 juegaPC :: Params -> IO Params
 juegaPC mat = do
@@ -73,13 +76,12 @@ juegaPC mat = do
 jugar' :: Params -> IO Params
 jugar' mat@(Params{matriz = m, nroTiro = n}) = do
       print m
-      case () of _
-                  | vVictoria mat -> reiniciarJuego mat
-                  | (even n)  ->  juegaUser mat
-                  | otherwise -> juegaPC mat
-                  
+      if(vVictoria mat) 
+        then reiniciarJuego mat
+        else if (even n) 
+              then  juegaUser mat
+              else  juegaPC mat
 -------------------------------------------------------------------
-
 reiniciarJuego :: Params  -> IO Params
 reiniciarJuego params = do
         limpiarPantalla  
