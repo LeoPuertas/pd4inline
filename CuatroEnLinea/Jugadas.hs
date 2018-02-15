@@ -101,8 +101,9 @@ perdioTiro w@(Params{perdido = p}) = w { perdido = 1}
 --FUNCION UTILIZADA EN CASO DE QUE NINGUNO DE LOS DOS ULTIMOS TIROS SIRVA DE REFERENCIAA PARA UNA JUGADA, ESTA FUNCION DEVUELVE SI HAY ALGUNA PENDIENTE SIN REFERENCIA
 barreFilasyColumnas:: Params -> Bool -> [Int] 
 barreFilasyColumnas w@(Params{ matriz = mat}) ganar = [ vFyC | row <- [7,6..1], col <- [1..8], 
-              let vFyC = (case ganar of True -> (vFilayColumnaGanar mat row col) 
-                                        otherwise  -> (vFilayColumnaJugada mat row col)), vFyC > 0 ]
+              let vFyC = (if ganar 
+                             then (vFilayColumnaGanar mat row col) 
+                             else (vFilayColumnaJugada mat row col)), vFyC > 0 ]
 
 --FUNCION QUE SE UTILIZA CON EL BARRER FILAS Y COLUMNAS PARA SABER SI EXISTE UNA JUGADA PENDIENTE SIN REFERENCIA A LOS ULTIMOS TIROS
 vFilayColumnaGanar:: Matrix Char -> Int -> Int -> Int

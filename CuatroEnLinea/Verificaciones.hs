@@ -39,19 +39,21 @@ vVictoriaDiagD :: Params -> Bool
 vVictoriaDiagD params 
      | d /= Nothing = True
      | otherwise = False
-     where d = getSubStringInit (cuatroPiezas params) (diagonalD params)
+     where 
+      d = getSubStringInit (cuatroPiezas params) (diagonalD params)
 
 --VERIFICA SI DIAGONALMENTE CRECIENTE A LA IZQUIERDA HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaDiagI :: Params -> Bool
 vVictoriaDiagI params
-     | d /= Nothing =True
+     | d /= Nothing = True
      | otherwise = False
-     where d =  getSubStringInit (cuatroPiezas params) (diagonalI params)
+     where 
+      d =  getSubStringInit (cuatroPiezas params) (diagonalI params)
 
 --FUNCION QUE INDICA SI HUBO UNA JUGADA DONDE HABIA 3 FICHAS CONSECUTIVAS PERO SE BLOQUEO ESA JUGADA, SE UTILIZA PARA NO SEGUIR TIRANDO EN ESA COLUMNA 
 --INTENTANDO FORMAR UNA VICTORIA VERTICAL YA QUE NO ES POSIBLE
 vBloquoVertical:: Params -> Bool
-vBloquoVertical w@(Params{ matriz = m, ultimoTiro = (row , col)}) 
+vBloquoVertical (Params{ matriz = m, ultimoTiro = (row , col)}) 
     | (x /= Nothing) = True 
     | otherwise = False
     where 
@@ -59,10 +61,11 @@ vBloquoVertical w@(Params{ matriz = m, ultimoTiro = (row , col)})
 
 --FUNCION QUE DEVUELVE SI LA MATRIZ ESTA LLENA PARA SABER SI FUE UN EMPATE
 lleno :: Params -> Bool
-lleno w@(Params{matriz = m}) = notElem vacio ((toList $transpose m)) 
-
+lleno (Params {nroTiro = n})
+    | n == 42 = True   
+    | otherwise = False 
 
 --FUNCION QUE DEVUELVE SI LA COLUMNA ESTA LLENA PARA INDICAR QUE PERDIO EL TIRO O QUE LA PC NO TIRE EN DICHA COLUMNA
 vColumnaLlena :: Params -> Int -> Bool
-vColumnaLlena w@(Params{matriz = m}) col = elem vacio ((toLists $transpose m)!!(col))
+vColumnaLlena (Params{matriz = m}) col = elem vacio ((toLists $transpose m)!!(col))
      

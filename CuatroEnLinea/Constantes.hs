@@ -16,20 +16,18 @@ paramPorDefecto = Params { matriz = fromLists ["*********","*       *","*       
 
 paramPruebas2 = Params { matriz = fromLists [
 "*********", --1
-"*       *", --2
-"*       *", --3
-"*       *", --4
-"*       *", --5
-"* X    O*", --6
-"*XX    O*", --7
+"*        *", --2
+"*        *", --3
+"*OO      *", --4
+"*XXX     *", --5
+"*XXXOOXO *", --6
+"*XXXOXOOO*", --7
 "*1234567*"],
-                           nroTiro = 5,ultimoTiro = (6,3), ultimoTiroPc = (6,8), perdido = 0}
+                           nroTiro = 5,ultimoTiro = (4,4), ultimoTiroPc = (5,5), perdido = 0}
 
 mensaje :: Int ->IO()
-mensaje x = do
-             case () of _
-                          |(x == 1)  -> putStrLn "Perdiste el turno anterior aprovecha este y elige bien la columna:"
-                          |otherwise -> putStrLn "Selecciona columna donde se colocara la ficha"
+mensaje 1 = putStrLn "La columna esta llena, selecciona otra columna donde colorar la ficha"
+mensaje _ = putStrLn "Selecciona columna donde se colocara la ficha"
 
 bloqueoVertical :: String
 bloqueoVertical = "XOOO"   
