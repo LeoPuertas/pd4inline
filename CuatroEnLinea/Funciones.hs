@@ -8,10 +8,9 @@ import System.Console.ANSI
 
 getSubStringInit :: String -> String -> Maybe Int
 getSubStringInit _ []  = Nothing
-getSubStringInit sub str = 
-	if (isPrefixOf sub str)
-	  then fmap (+1) $ getSubStringInit sub (tail str)
-      else Just 0
+getSubStringInit sub str = case isPrefixOf sub str of
+  False -> fmap (+1) $ getSubStringInit sub (tail str)
+  True  -> Just 0
 
 getNum :: Maybe Int -> Int
 getNum Nothing = -1
