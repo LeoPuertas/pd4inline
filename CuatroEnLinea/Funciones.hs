@@ -4,13 +4,17 @@ module CuatroEnLinea.Funciones where
 import Data.List as L
 import Text.Read
 import System.Console.ANSI 
-import Control.Applicative    
+import Control.Applicative  
+import Data.Maybe  
 
 
 getSubStringInit :: String -> String -> Maybe Int
 getSubStringInit _ []  = Nothing
 getSubStringInit sub str = if sub `isPrefixOf` str then Just 0 else
                               (+ 1) <$> getSubStringInit sub (tail str)
+
+vSubString :: String -> String -> Bool
+vSubString s1 s2 = isJust $ getSubStringInit s1 s2
 
 
 getNum :: Maybe Int -> Int
