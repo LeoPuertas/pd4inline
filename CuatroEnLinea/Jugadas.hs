@@ -156,11 +156,12 @@ vBloqVictoriaUser row
 vPosibleVicoriaPC :: String -> Int
 vPosibleVicoriaPC row 
     | isJust v1 = getNum v1
-    | isJust v2 = getNum v2 + 1 
-    | isJust v3 = getNum v3 + 2
+    | isJust v2 = getNum v2 + 2 
+    | isJust v3 = getNum v3 
+    | isJust v4 = getNum v4 + 1
     | otherwise = -1
     where 
          v1 = getSubStringInit " OO" row
          v2 = getSubStringInit "OO " row 
          v3 = getSubStringInit " O O" row
---------------------------------------------------
+         v4 = getSubStringInit "O O" row
