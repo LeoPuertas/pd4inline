@@ -43,14 +43,14 @@ jugarContraJugador = do
 ------------Juega contra Jugador---------------------------------
 
 jugarContraJugador' :: Params -> IO Params
-jugarContraJugador' mat@(Params{matriz = m, perdido = p})  
-      | (vVictoria mat) = reiniciarJuego mat
+jugarContraJugador' mat@Params{matriz = m, perdido = p}  
+      | vVictoria mat = reiniciarJuego mat
       | lleno mat = empate mat
       | otherwise =  do print m
                         mensaje p
                         col <- getLine 
                         limpiarPantalla
-                        if  (checkInput col) 
+                        if  checkInput col
                           then  jugarContraJugador' $ tiro' mat (read col :: Int) 
                           else do 
                                   print mat
@@ -63,7 +63,7 @@ juegaUser :: Params -> IO Params
 juegaUser mat = do
          mensaje (perdido mat)
          col <- getLine 
-         if (checkInput col) 
+         if checkInput col 
            then jugar' $ tiro' mat (read col :: Int) 
            else do putStrLn "Error de Jugada, intente de nuevo"
                    jugar' mat
@@ -74,11 +74,11 @@ juegaPC mat = do
          jugar' $ tiro' mat (tiroPC  mat)
 
 jugar' :: Params -> IO Params
-jugar' mat@(Params{matriz = m, nroTiro = n}) = do
+jugar' mat@Params{matriz = m, nroTiro = n} = do
       print m
-      if(vVictoria mat) 
+      if vVictoria mat 
         then reiniciarJuego mat
-        else if (even n) 
+        else if even n 
               then  juegaUser mat
               else  juegaPC mat
 -------------------------------------------------------------------
@@ -87,7 +87,7 @@ reiniciarJuego params = do
         limpiarPantalla  
         print (matriz params)
         mostrarTablero params
-        putStrLn $"Gano el jugador " ++ [(getUltPieza params)] ++ "\n"
+        putStrLn $"Gano el jugador " ++ [getUltPieza params] ++ "\n"
         main
 
 empate :: Params -> IO Params

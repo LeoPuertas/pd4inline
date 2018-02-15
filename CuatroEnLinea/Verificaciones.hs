@@ -9,10 +9,11 @@ import CuatroEnLinea.Tipos
 import CuatroEnLinea.Matriz
 
 import Data.Matrix
+import Data.Maybe
 
 --FUNCION QUE DEVULVE SI UN JUGAOR CUMPLIO ALGUNA DE LAS 4 POSIBILIDADES PARA GANAR
 vVictoria :: Params -> Bool
-vVictoria params = (vVertical || vHorizontal || vDiagonalI || vDiagonalD)
+vVictoria params = vVertical || vHorizontal || vDiagonalI || vDiagonalD
         where vHorizontal = vVictoriaH  params 
               vVertical   = vVictoriaV    params 
               vDiagonalI  = vVictoriaDiagI   params 
@@ -20,16 +21,16 @@ vVictoria params = (vVertical || vHorizontal || vDiagonalI || vDiagonalD)
 
 --VERIFICA SI HORIZONTALMENTE HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaH :: Params -> Bool 
-vVictoriaH w@(Params{ matriz = m, ultimoTiro = (row , _)}) 
-    | (x /= Nothing) = True 
+vVictoriaH w@Params{ matriz = m, ultimoTiro = (row , _)} 
+    | isJust x  = True 
     | otherwise = False
     where
        x = getSubStringInit (cuatroPiezas w) $getFila m (row-1)
 
 --VERIFICA SI VERTICALMENTE HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaV :: Params -> Bool
-vVictoriaV w@(Params{ matriz = m, ultimoTiro = (_ , col)}) 
-    | (x /= Nothing) = True 
+vVictoriaV w@Params{ matriz = m, ultimoTiro = (_ , col)}
+    | isJust x  = True 
     | otherwise = False
     where 
        x = getSubStringInit (cuatroPiezas w) $getColumna m (col-1)
@@ -37,14 +38,14 @@ vVictoriaV w@(Params{ matriz = m, ultimoTiro = (_ , col)})
 --VERIFICA SI DIAGONALMENTE CRECIENTE A LA DERECHA HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaDiagD :: Params -> Bool
 vVictoriaDiagD params 
-     | d /= Nothing = True
+     | isJust d  = True
      | otherwise = False
      where d = getSubStringInit (cuatroPiezas params) (diagonalD params)
 
 --VERIFICA SI DIAGONALMENTE CRECIENTE A LA IZQUIERDA HAY CUATRO FICHAS CONSECUTIVAS
 vVictoriaDiagI :: Params -> Bool
 vVictoriaDiagI params
-     | d /= Nothing = True
+     | isJust d  = True
      | otherwise = False
      where 
       d =  getSubStringInit (cuatroPiezas params) (diagonalI params)
@@ -52,19 +53,19 @@ vVictoriaDiagI params
 --FUNCION QUE INDICA SI HUBO UNA JUGADA DONDE HABIA 3 FICHAS CONSECUTIVAS PERO SE BLOQUEO ESA JUGADA, SE UTILIZA PARA NO SEGUIR TIRANDO EN ESA COLUMNA 
 --INTENTANDO FORMAR UNA VICTORIA VERTICAL YA QUE NO ES POSIBLE
 vBloquoVertical:: Params -> Bool
-vBloquoVertical (Params{ matriz = m, ultimoTiro = (_ , col)}) 
-    | (x /= Nothing) = True 
+vBloquoVertical Params{ matriz = m, ultimoTiro = (_ , col)} 
+    | isJust x  = True 
     | otherwise = False
     where 
-       x = getSubStringInit (bloqueoVertical)  $getColumna m (col-1)
+       x = getSubStringInit bloqueoVertical  $getColumna m (col-1)
 
 --FUNCION QUE DEVUELVE SI LA MATRIZ ESTA LLENA PARA SABER SI FUE UN EMPATE
 lleno :: Params -> Bool
-lleno (Params {nroTiro = n})
+lleno Params {nroTiro = n}
     | n == 42 = True   
     | otherwise = False 
 
 --FUNCION QUE DEVUELVE SI LA COLUMNA ESTA LLENA PARA INDICAR QUE PERDIO EL TIRO O QUE LA PC NO TIRE EN DICHA COLUMNA
 vColumnaLlena :: Params -> Int -> Bool
-vColumnaLlena (Params{matriz = m}) col = elem vacio ((toLists $transpose m)!!(col))
+vColumnaLlena params col = elem vacio $getColumna (matriz params) col
      
